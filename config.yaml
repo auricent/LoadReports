@@ -1,0 +1,14 @@
+s3:
+  bucket_name: ""
+  region_name: ""
+  aws_access_key_id: ""
+  aws_secret_access_key: ""
+
+db:
+  host: "localhost"
+  port: 3306
+  username: "root"
+  password: ""
+  database: "bt_adn_reports"
+
+slack_webhook_url: ""
