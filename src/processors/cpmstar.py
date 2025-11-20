@@ -21,6 +21,7 @@ class CpmstarReportProcessor(ReportProcessor):
                     report = CpmstarReport(
                         day=day,
                         country=row.get('country', ''),
+                        ad_type=row.get("ad_type",0),
                         pool_id=int(row.get('pool_id', 0)),
                         pool_name=row.get('pool_name', ''),
                         clicks=int(row.get('clicks', 0)),

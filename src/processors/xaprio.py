@@ -22,6 +22,7 @@ class XaprioReportProcessor(ReportProcessor):
                         day=day,
                         zone_id=int(row.get('zone_id', 0)),
                         zone_name=row.get('zone_name', ''),
+                        ad_type=row.get('ad_type',0),
                         requests=int(row.get('requests', 0)),
                         coverage=int(row.get('coverage', 0)),
                         clicks=int(row.get('clicks', 0)),

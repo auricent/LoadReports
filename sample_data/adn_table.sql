@@ -29,6 +29,7 @@ CREATE TABLE IF NOT EXISTS cpmstar_report (
     `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'primary key',
     `day` DATE NOT NULL DEFAULT '1970-01-01' COMMENT 'report date',
     `country` VARCHAR(20) NOT NULL DEFAULT '' COMMENT 'country code',
+    `ad_type` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'ad type(0: video, 1: display)',
     `pool_id` INT(11) NOT NULL DEFAULT '0' COMMENT 'unit id',
     `pool_name` VARCHAR(64) NOT NULL DEFAULT '' COMMENT 'unit name',
     `clicks` BIGINT(20) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'clicks',
@@ -38,20 +39,6 @@ CREATE TABLE IF NOT EXISTS cpmstar_report (
     PRIMARY KEY (`id`),
     INDEX day_country_idx(`day`, `country`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='cpmstar report';
-
-CREATE TABLE IF NOT EXISTS xaprio_report (
-    `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'primary key',
-    `day` DATE NOT NULL DEFAULT '1970-01-01' COMMENT 'report date',
-    `zone_id` INT(11) NOT NULL DEFAULT '0' COMMENT 'unit id',
-    `zone_name` VARCHAR(128) NOT NULL DEFAULT '' COMMENT 'unit name',
-    `requests` BIGINT(20) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'requests',
-    `coverage` BIGINT(20) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'responses',
-    `clicks` BIGINT(20) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'clicks',
-    `impressions` BIGINT(20) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'impressions',
-    `revenue` DECIMAL(20, 6) NOT NULL DEFAULT '0' COMMENT 'revenue',
-    PRIMARY KEY (`id`),
-    INDEX day_zone_id_idx(`day`, `zone_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='xaprio report';
 
 CREATE TABLE IF NOT EXISTS smartAdServer_report (
     `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'primary key',
@@ -96,6 +83,21 @@ CREATE TABLE applovin_max_report (
     PRIMARY KEY (`id`),
     INDEX day_country_platform_idx(`day`, `country`, `platform`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='applovin max report';
+
+CREATE TABLE IF NOT EXISTS xaprio_report (
+    `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'primary key',
+    `day` DATE NOT NULL DEFAULT '1970-01-01' COMMENT 'report date',
+    `zone_id` INT(11) NOT NULL DEFAULT '0' COMMENT 'unit id',
+    `zone_name` VARCHAR(128) NOT NULL DEFAULT '' COMMENT 'unit name',
+    `ad_type` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'ad type(0: video, 1: display)',
+    `requests` BIGINT(20) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'requests',
+    `coverage` BIGINT(20) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'responses',
+    `clicks` BIGINT(20) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'clicks',
+    `impressions` BIGINT(20) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'impressions',
+    `revenue` DECIMAL(20, 6) NOT NULL DEFAULT '0' COMMENT 'revenue',
+    PRIMARY KEY (`id`),
+    INDEX day_zone_id_idx(`day`, `zone_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='xaprio report';
 
 CREATE TABLE IF NOT EXISTS adn_aggregation_revenue_report (
     `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'primary key',

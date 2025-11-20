@@ -8,6 +8,7 @@ from src.models.base import ReportData
 class XaprioReport(ReportData):
     zone_id: int
     zone_name: str
+    ad_type: int
     requests: int
     coverage: int
     clicks: int
@@ -19,6 +20,7 @@ class XaprioReport(ReportData):
             "day": self.day,
             "zone_id": self.zone_id,
             "zone_name": self.zone_name,
+            "ad_type": self.ad_type,
             "requests": self.requests,
             "coverage": self.coverage,
             "clicks": self.clicks,

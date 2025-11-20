@@ -7,6 +7,7 @@ from src.models.base import ReportData
 @dataclass
 class CpmstarReport(ReportData):
     country: str
+    ad_type: int
     pool_id: int
     pool_name: str
     clicks: int
@@ -18,6 +19,7 @@ class CpmstarReport(ReportData):
         return {
             "day": self.day,
             "country": self.country,
+            "ad_type": self.ad_type,
             "pool_id": self.pool_id,
             "pool_name": self.pool_name,
             "clicks": self.clicks,
