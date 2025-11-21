@@ -7,6 +7,7 @@ from src.models.base import ReportData
 @dataclass
 class SmartAdServerReport(ReportData):
     country: str
+    auctions: int
     clicks: int
     impressions: int
     revenue: float
@@ -15,6 +16,7 @@ class SmartAdServerReport(ReportData):
         return {
             "day": self.day,
             "country": self.country,
+            "auctions": self.auctions,
             "clicks": self.clicks,
             "impressions": self.impressions,
             "revenue": self.revenue

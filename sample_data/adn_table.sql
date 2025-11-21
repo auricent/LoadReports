@@ -1,3 +1,6 @@
+CREATE DATABASE IF NOT EXISTS bt_adn_reports;
+use bt_adn_reports;
+
 CREATE TABLE IF NOT EXISTS bidmatic_report (
     `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'primary key',
     `day` DATE NOT NULL DEFAULT '1970-01-01' COMMENT 'report date',
@@ -46,6 +49,7 @@ CREATE TABLE IF NOT EXISTS smartAdServer_report (
     `country` VARCHAR(20) NOT NULL DEFAULT '' COMMENT 'country code',
     `clicks` BIGINT(20) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'clicks',
     `impressions` BIGINT(20) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'impressions',
+    `auctions` BIGINT(20) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'auctions',
     `revenue` DECIMAL(20, 6) NOT NULL DEFAULT '0' COMMENT 'revenue',
     PRIMARY KEY (`id`),
     INDEX day_country_idx(`day`, `country`)

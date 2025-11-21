@@ -59,6 +59,10 @@ class DataProcessor:
                 reports = processor.process_data(local_path)
 
                 if reports:
+                    date_str = s3_prefix.split("/")[-1]
+                    logger.info(f"delete data of  {table_name} in {date_str}")
+                    self.db_client.delete_data(table_name, 'day', date_str)
+
                     logger.info(f"Inserting {len(reports)} reports into {table_name}")
                     self.db_client.batch_insert_reports(table_name, reports)
                 else:

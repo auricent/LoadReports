@@ -21,6 +21,7 @@ class SmartAdServerReportProcessor(ReportProcessor):
                     report = SmartAdServerReport(
                         day=day,
                         country=row.get('country', ''),
+                        auctions=row.get('auctions',0),
                         clicks=int(row.get('clicks', 0)),
                         impressions=int(row.get('impressions', 0)),
                         revenue=float(row.get('revenue', 0.0))
