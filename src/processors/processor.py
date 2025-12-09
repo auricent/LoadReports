@@ -1,13 +1,17 @@
 import os
 from typing import Dict
+
+from src.models.seetag import SeetagReport
 from src.processors.bidmatic import BidmaticReportProcessor
 from src.processors.aggregation import AggregationReportProcessor
 from src.processors.didna import DidnaReportProcessor
 from src.processors.cpmstar import CpmstarReportProcessor
+from src.processors.seetag import SeetagReportProcessor
 from src.processors.xaprio import XaprioReportProcessor
 from src.processors.smartadserver import SmartAdServerReportProcessor
 from src.processors.freewheel import FreewheelReportProcessor
 from src.processors.applovin import ApplovinMaxReportProcessor
+from src.processors.yandex import YandexReportProcessor
 from src.util.s3_client import S3Client
 from src.util.database import DatabaseClient
 from src.util.logger import get_logger
@@ -35,6 +39,10 @@ class DataProcessor:
             'smartadserver_aggregation.csv': (AggregationReportProcessor(), 'adn_aggregation_revenue_report'),
             'freewheel.csv': (FreewheelReportProcessor(), 'freewheel_report'),
             'freewheel_aggregation.csv': (AggregationReportProcessor(), 'adn_aggregation_revenue_report'),
+            'yandex.csv': (YandexReportProcessor(),'yandex_report'),
+            'yandex_aggregation.csv': (AggregationReportProcessor(), 'adn_aggregation_revenue_report'),
+            'seedtag.csv': (SeetagReportProcessor(),'seedtag_report'),
+            'seedtag_aggregation.csv': (AggregationReportProcessor(), 'adn_aggregation_revenue_report'),
         }
     
     def register_processor(self, file_pattern: str, processor: tuple) -> None:

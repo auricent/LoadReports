@@ -109,8 +109,8 @@ CREATE TABLE IF NOT EXISTS adn_aggregation_revenue_report (
     `day` DATE NOT NULL DEFAULT '1970-01-01' COMMENT '日期',
     `country` VARCHAR(64) NOT NULL DEFAULT '' COMMENT '国家代码(2位大写)',
     `platform` VARCHAR(64) NOT NULL DEFAULT '' COMMENT '平台(IOS/Android/PC)',
-    `app_id` tinyint(1) UNSIGNED NOT NULL DEFAULT '0' COMMENT '应用ID(0: unknown，1: bt-android, 2: ut-android, 3: rainberrytv.com)',
-    `app_name` VARCHAR(128) NOT NULL DEFAULT '' COMMENT '应用名称(bt-android/ut-android/rainberrytv.com)',
+    `app_id` tinyint(1) UNSIGNED NOT NULL DEFAULT '0' COMMENT '应用ID(0: unknown, 1: bt-android, 2: ut-android, 3: rainberrytv.com, 4: bittorrent.com, 5: utorrent.com)',
+    `app_name` VARCHAR(128) NOT NULL DEFAULT '' COMMENT '应用名称(bt-android/ut-android/rainberrytv.com/bittorrent.com/utorrent.com)',
     `unit_id` VARCHAR(128) NOT NULL DEFAULT '' COMMENT '广告单元ID',
     `unit_name` VARCHAR(128) NOT NULL DEFAULT '' COMMENT '广告单元名称',
     `device_type` VARCHAR(64) NOT NULL DEFAULT '' COMMENT '设备类型',
@@ -125,3 +125,28 @@ CREATE TABLE IF NOT EXISTS adn_aggregation_revenue_report (
     PRIMARY KEY (`id`),
     INDEX adn_idx(adn_network, day, country, platform, app_id, unit_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='ADN聚合收入报告表';
+
+CREATE TABLE IF NOT EXISTS yandex_report (
+    `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'primary key',
+    `day` DATE NOT NULL DEFAULT '1970-01-01' COMMENT 'report date',
+    `unit_name` VARCHAR(128) NOT NULL DEFAULT '0' COMMENT 'unit name',
+    `country` VARCHAR(20) NOT NULL DEFAULT '' COMMENT 'country code',
+    `requests` BIGINT(20) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'requests',
+    `clicks` BIGINT(20) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'clicks',
+    `impressions` BIGINT(20) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'impressions',
+    `revenue` DECIMAL(20, 6) NOT NULL DEFAULT '0' COMMENT 'revenue',
+    PRIMARY KEY (`id`),
+    INDEX day_country_unit_idx(`day`, `country`, `unit_name`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='yandex report';
+
+CREATE TABLE IF NOT EXISTS seedtag_report (
+    `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'primary key',
+    `day` DATE NOT NULL DEFAULT '1970-01-01' COMMENT 'report date',
+    `publisher_name` VARCHAR(128) NOT NULL DEFAULT '0' COMMENT 'app name',
+    `ad_type` VARCHAR(20) NOT NULL DEFAULT '' COMMENT 'ad type',
+    `clicks` BIGINT(20) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'clicks',
+    `impressions` BIGINT(20) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'impressions',
+    `revenue` DECIMAL(20, 6) NOT NULL DEFAULT '0' COMMENT 'revenue',
+    PRIMARY KEY (`id`),
+    INDEX day_publisher_adtype_idx(`day`, `publisher_name`, `ad_type`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='seedtag report';

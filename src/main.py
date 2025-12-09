@@ -5,9 +5,10 @@ from src.util.database import DatabaseClient
 from src.processors.processor import DataProcessor
 from src.util.slack_notifier import SlackNotifier
 from src.util.logger import get_logger
+import argparse
 
 
-def main():
+def main(start_date_str=None, end_date_str=None):
     logger = get_logger("main")
     logger.info("Starting ADN Report Processor")
 
@@ -27,10 +28,22 @@ def main():
         try:
             processor = DataProcessor(s3_client, db_client)
 
-            today = datetime.date.today()
-            date_string = today.strftime("%Y-%m-%d")
+            if start_date_str is None or end_date_str is None:
+                today = datetime.date.today()
+                date_string = today.strftime("%Y-%m-%d")
+                processor.process_s3_files(f"reports/{date_string}")
+            else:
+                # 转成 date 类型
+                start_date = datetime.datetime.strptime(start_date_str, "%Y-%m-%d").date()
+                end_date = datetime.datetime.strptime(end_date_str, "%Y-%m-%d").date()
 
-            processor.process_s3_files(f"reports/{date_string}")
+                # 日期范围循环（包含 end）
+                current_date = start_date
+                while current_date <= end_date:
+                    date_string = current_date.strftime("%Y-%m-%d")
+                    processor.process_s3_files(f"reports/{date_string}")
+                    current_date += datetime.timedelta(days=1)
+
             logger.info("Data processing completed successfully")
 
         finally:
@@ -45,4 +58,11 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument("--start", type=str, required=False)
+    parser.add_argument("--end", type=str, required=False)
+
+    args = parser.parse_args()
+
+    main(args.start, args.end)
