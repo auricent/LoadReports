@@ -68,8 +68,14 @@ class DataProcessor:
 
                 if reports:
                     date_str = s3_prefix.split("/")[-1]
-                    logger.info(f"delete data of  {table_name} in {date_str}")
-                    self.db_client.delete_data(table_name, 'day', date_str)
+
+                    if file_name.endswith('_aggregation.csv'):
+                        adn_network = reports[0].adn_network
+                        logger.info(f"delete data of  {table_name},{adn_network} in {date_str}")
+                        self.db_client.delete_agg_data(table_name, adn_network,'day', date_str)
+                    else:
+                        logger.info(f"delete data of  {table_name} in {date_str}")
+                        self.db_client.delete_data(table_name,'day', date_str)
 
                     logger.info(f"Inserting {len(reports)} reports into {table_name}")
                     self.db_client.batch_insert_reports(table_name, reports)

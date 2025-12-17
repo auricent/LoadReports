@@ -68,6 +68,20 @@ class DatabaseClient:
         self.connection.commit()
         cursor.close()
         logger.info(f"Deleted {deleted_rows} records from {table_name} for {date_column} = {date_value}")
+
+    def delete_agg_data(self, table_name: str, adn_network: str, date_column: str, date_value: str) -> None:
+        if not self.connection or not self.connection.is_connected():
+            raise Exception("Database not connected")
+
+        cursor = self.connection.cursor()
+
+        sql = f"DELETE FROM {table_name} WHERE {date_column} = %s and adn_network= %s"
+
+        cursor.execute(sql, (date_value,adn_network))
+        deleted_rows = cursor.rowcount
+        self.connection.commit()
+        cursor.close()
+        logger.info(f"Deleted {deleted_rows} records from {table_name} for {date_column} = {date_value} and adn_network = {adn_network}")
     
     def batch_insert_reports(self, table_name: str, reports: List[ReportData]) -> None:
         logger.info(f"Batch inserting {len(reports)} reports into {table_name}")

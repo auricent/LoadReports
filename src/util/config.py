@@ -28,7 +28,7 @@ class Config:
     slack_webhook_url: Optional[str] = None
 
     @classmethod
-    def load(cls, config_path: str = "../config.yaml") -> "Config":
+    def load(cls, config_path: str = "config.yaml") -> "Config":
         config_data = {}
         if os.path.exists(config_path):
             try:
