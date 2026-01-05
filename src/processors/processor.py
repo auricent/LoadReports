@@ -1,11 +1,14 @@
 import os
 from typing import Dict
 
-from src.models.seetag import SeetagReport
+from src.processors.allUsersInstall import AllUsersInstallProcessor
 from src.processors.bidmatic import BidmaticReportProcessor
 from src.processors.aggregation import AggregationReportProcessor
 from src.processors.didna import DidnaReportProcessor
 from src.processors.cpmstar import CpmstarReportProcessor
+from src.processors.firebase import FirebaseProcessor
+from src.processors.geoAllUsersInstall import GeoAllUsersInstallProcessor
+from src.processors.newUsersInstall import NewUsersInstallProcessor
 from src.processors.seetag import SeetagReportProcessor
 from src.processors.xaprio import XaprioReportProcessor
 from src.processors.smartadserver import SmartAdServerReportProcessor
@@ -43,6 +46,10 @@ class DataProcessor:
             'yandex_aggregation.csv': (AggregationReportProcessor(), 'adn_aggregation_revenue_report'),
             'seedtag.csv': (SeetagReportProcessor(),'seedtag_report'),
             'seedtag_aggregation.csv': (AggregationReportProcessor(), 'adn_aggregation_revenue_report'),
+            'addTorrent.csv': (FirebaseProcessor(), 'firebase'),
+            'all-users-install.csv': (AllUsersInstallProcessor(), 'google_play_all_users_install'),
+            'new-users-install.csv': (NewUsersInstallProcessor(), 'google_play_new_users_install'),
+            'all-countries-install.csv': (GeoAllUsersInstallProcessor(), 'google_play_all_countries_install'),
         }
     
     def register_processor(self, file_pattern: str, processor: tuple) -> None:

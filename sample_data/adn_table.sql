@@ -150,3 +150,38 @@ CREATE TABLE IF NOT EXISTS seedtag_report (
     PRIMARY KEY (`id`),
     INDEX day_publisher_adtype_idx(`day`, `publisher_name`, `ad_type`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='seedtag report';
+
+CREATE TABLE IF NOT EXISTS firebase (
+    `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'primary key',
+    `day` DATE NOT NULL DEFAULT '1970-01-01' COMMENT 'report date',
+    `events` BIGINT(20) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'number of events',
+    `users` BIGINT(20) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'number of users',
+    PRIMARY KEY (`id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='firebase';
+
+
+CREATE TABLE IF NOT EXISTS google_play_all_users_install (
+    `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'primary key',
+    `day` DATE NOT NULL DEFAULT '1970-01-01' COMMENT 'report date',
+    `app` VARCHAR(20) NOT NULL DEFAULT '' COMMENT 'app',
+    `users` BIGINT(20) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'number of users',
+    PRIMARY KEY (`id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='google play all_users_install';
+
+
+CREATE TABLE IF NOT EXISTS google_play_new_users_install (
+    `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'primary key',
+    `day` DATE NOT NULL DEFAULT '1970-01-01' COMMENT 'report date',
+    `app` VARCHAR(20) NOT NULL DEFAULT '' COMMENT 'app',
+    `users` BIGINT(20) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'number of users',
+    PRIMARY KEY (`id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='google play new_users_install';
+
+CREATE TABLE IF NOT EXISTS google_play_all_countries_install (
+    `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'primary key',
+    `day` DATE NOT NULL DEFAULT '1970-01-01' COMMENT 'report date',
+    `app` VARCHAR(20) NOT NULL DEFAULT '' COMMENT 'app',
+    `users` BIGINT(20) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'number of users',
+    `country` VARCHAR(20) NOT NULL DEFAULT '' COMMENT 'country code',
+    PRIMARY KEY (`id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='google play all_countries_install';
