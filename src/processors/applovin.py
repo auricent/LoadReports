@@ -11,10 +11,11 @@ class ApplovinMaxReportProcessor(ReportProcessor):
     
     def process_data(self, file_path: str) -> List[ReportData]:
         reports = []
+        failed_rows = []
         
         with open(file_path, 'r', encoding='utf-8') as csvfile:
             reader = csv.DictReader(csvfile)
-            for row in reader:
+            for row_num, row in enumerate(reader, start=2):  # start=2 因为第1行是表头
                 try:
                     day_str = row.get('day', '1970-01-01')
                     day = datetime.strptime(day_str, '%Y-%m-%d').date()
@@ -36,7 +37,12 @@ class ApplovinMaxReportProcessor(ReportProcessor):
                     )
                     reports.append(report)
                 except (ValueError, KeyError) as e:
-                    logging.error(f"Skipping invalid row: {row}. Error: {e}")
+                    logging.error(f"Row {row_num} invalid: {row}. Error: {e}")
+                    failed_rows.append((row_num, str(e)))
+        
+        # 如果有失败的行，抛出异常以触发告警
+        if failed_rows:
+            raise ValueError(f"Failed to parse {len(failed_rows)} rows: {failed_rows[:5]}")  # 只显示前5个错误
         
         return reports
     

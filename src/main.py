@@ -26,7 +26,7 @@ def main(start_date_str=None, end_date_str=None):
         logger.info("Database connected")
         
         try:
-            processor = DataProcessor(s3_client, db_client)
+            processor = DataProcessor(s3_client, db_client, slack_notifier)
 
             if start_date_str is None or end_date_str is None:
                 today = datetime.date.today()
@@ -42,9 +42,10 @@ def main(start_date_str=None, end_date_str=None):
                 while current_date <= end_date:
                     date_string = current_date.strftime("%Y-%m-%d")
                     processor.process_s3_files(f"reports/{date_string}")
+                    processor.clear_failed_tasks()  # 每天处理完后清空，下一天重新统计
                     current_date += datetime.timedelta(days=1)
 
-            logger.info("Data processing completed successfully")
+            logger.info("Data processing completed")
 
         finally:
             db_client.disconnect()

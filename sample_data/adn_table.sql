@@ -185,3 +185,4 @@ CREATE TABLE IF NOT EXISTS google_play_all_countries_install (
     `country` VARCHAR(20) NOT NULL DEFAULT '' COMMENT 'country code',
     PRIMARY KEY (`id`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='google play all_countries_install';
+
