@@ -26,6 +26,7 @@ class Config:
     s3: S3Config
     db: DatabaseConfig
     slack_webhook_url: Optional[str] = None
+    s3_external: Optional[S3Config] = None  # 外部 S3 bucket 配置
 
     @classmethod
     def load(cls, config_path: str = "config.yaml") -> "Config":
@@ -45,6 +46,17 @@ class Config:
             aws_secret_access_key=os.getenv("s3_aws_secret_access_key", s3_data.get("aws_secret_access_key")),
         )
 
+        # 外部 S3 bucket 配置 (用于 bittorrent installer 等)
+        s3_external_data = config_data.get("s3_external", {})
+        s3_external_config = None
+        if s3_external_data:
+            s3_external_config = S3Config(
+                bucket_name=os.getenv("s3_external_bucket_name", s3_external_data.get("bucket_name", "")),
+                region_name=os.getenv("s3_external_region_name", s3_external_data.get("region_name", "us-east-1")),
+                aws_access_key_id=os.getenv("s3_external_aws_access_key_id", s3_external_data.get("aws_access_key_id")),
+                aws_secret_access_key=os.getenv("s3_external_aws_secret_access_key", s3_external_data.get("aws_secret_access_key")),
+            )
+
         db_data = config_data.get("db", {})
         db_config = DatabaseConfig(
             host=os.getenv("db_host", db_data.get("host", "localhost")),
@@ -56,7 +68,7 @@ class Config:
 
         slack_webhook_url = os.getenv("slack_webhook_url", config_data.get("slack_webhook_url"))
 
-        return cls(s3=s3_config, db=db_config, slack_webhook_url=slack_webhook_url)
+        return cls(s3=s3_config, db=db_config, slack_webhook_url=slack_webhook_url, s3_external=s3_external_config)
 
     @classmethod
     def from_env(cls) -> "Config":

@@ -1,10 +1,12 @@
 import os
+import re
 import traceback
 from typing import Dict, Optional, List
 
 from src.processors.allUsersInstall import AllUsersInstallProcessor
 from src.processors.bidmatic import BidmaticReportProcessor
 from src.processors.aggregation import AggregationReportProcessor
+from src.processors.bittorrent import BittorrentInstallerProcessor
 from src.processors.didna import DidnaReportProcessor
 from src.processors.cpmstar import CpmstarReportProcessor
 from src.processors.firebase import FirebaseProcessor
@@ -24,6 +26,8 @@ logger = get_logger("processor")
 
 
 class DataProcessor:
+
+    agg_deleted = False
     
     def __init__(self, s3_client: S3Client, db_client: DatabaseClient, slack_notifier=None):
         self.s3_client = s3_client
@@ -101,11 +105,11 @@ class DataProcessor:
         if reports:
             date_str = s3_prefix.split("/")[-1]
 
-            if file_name.endswith('_aggregation.csv'):
-                adn_network = reports[0].adn_network
-                logger.info(f"delete data of  {table_name},{adn_network} in {date_str}")
-                self.db_client.delete_agg_data(table_name, adn_network, 'day', date_str)
-            else:
+            if file_name.endswith('_aggregation.csv') and not self.agg_deleted:
+                logger.info(f"delete data of  adn_aggregation_revenue_report in {date_str}")
+                self.db_client.delete_data("adn_aggregation_revenue_report", 'day', date_str)
+                self.agg_deleted=True
+            elif not file_name.endswith('_aggregation.csv'):
                 logger.info(f"delete data of  {table_name} in {date_str}")
                 self.db_client.delete_data(table_name, 'day', date_str)
 
@@ -159,3 +163,49 @@ class DataProcessor:
     def clear_failed_tasks(self) -> None:
         """清空失败任务列表"""
         self.failed_tasks = []
+    
+    def process_bittorrent_file(self, s3_client: S3Client, date_str: str) -> None:
+        """
+        处理 Bittorrent Installer 报告文件
+        文件路径格式: production/bittorrent/Bittorrent__{YYYYMMDD}.csv
+        """
+        # 将日期格式从 YYYY-MM-DD 转换为 YYYYMMDD
+        date_formatted = date_str.replace("-", "")
+        file_key = f"production/bittorrent/Bittorrent__{date_formatted}.csv"
+        file_name = f"Bittorrent__{date_formatted}.csv"
+        
+        logger.info(f"Processing Bittorrent file: {file_key}")
+        
+        try:
+            # 下载文件
+            local_path = f"/tmp/{file_name}"
+            s3_client.download_file(file_key, local_path)
+            
+            # 处理数据
+            processor = BittorrentInstallerProcessor()
+            table_name = "bittorrent_installer_report"
+            
+            reports = processor.process_data(local_path)
+            
+            if reports:
+                logger.info(f"delete data of {table_name} in {date_str}")
+                self.db_client.delete_data(table_name, 'day', date_str)
+                
+                logger.info(f"Inserting {len(reports)} reports into {table_name}")
+                self.db_client.batch_insert_reports(table_name, reports)
+            else:
+                logger.info(f"No reports to insert for {file_name}")
+            
+            logger.info(f"Finished processing {file_name}")
+            
+        except Exception as e:
+            error_info = {
+                'file_name': file_name,
+                'file_key': file_key,
+                's3_prefix': f"production/bittorrent/{date_str}",
+                'error': str(e),
+                'traceback': traceback.format_exc()
+            }
+            self.failed_tasks.append(error_info)
+            logger.error(f"Failed to process file {file_name}: {str(e)}", exc_info=True)
+            self._send_task_failure_alert(error_info)

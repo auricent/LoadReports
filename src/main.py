@@ -20,6 +20,13 @@ def main(start_date_str=None, end_date_str=None):
     try:
         s3_client = S3Client(config.s3)
         db_client = DatabaseClient(config.db)
+        
+        # 初始化外部 S3 客户端 (用于 bittorrent installer 等)
+        s3_external_client = None
+        if config.s3_external:
+            s3_external_client = S3Client(config.s3_external)
+            logger.info("External S3 client initialized")
+        
         logger.info("Clients initialized")
 
         db_client.connect()
@@ -32,6 +39,10 @@ def main(start_date_str=None, end_date_str=None):
                 today = datetime.date.today()
                 date_string = today.strftime("%Y-%m-%d")
                 processor.process_s3_files(f"reports/{date_string}")
+                
+                # 处理 bittorrent installer 报告
+                if s3_external_client:
+                    processor.process_bittorrent_file(s3_external_client, date_string)
             else:
                 # 转成 date 类型
                 start_date = datetime.datetime.strptime(start_date_str, "%Y-%m-%d").date()
@@ -42,6 +53,11 @@ def main(start_date_str=None, end_date_str=None):
                 while current_date <= end_date:
                     date_string = current_date.strftime("%Y-%m-%d")
                     processor.process_s3_files(f"reports/{date_string}")
+                    
+                    # 处理 bittorrent installer 报告
+                    if s3_external_client:
+                        processor.process_bittorrent_file(s3_external_client, date_string)
+                    
                     processor.clear_failed_tasks()  # 每天处理完后清空，下一天重新统计
                     current_date += datetime.timedelta(days=1)
 

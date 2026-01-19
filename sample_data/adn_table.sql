@@ -186,3 +186,21 @@ CREATE TABLE IF NOT EXISTS google_play_all_countries_install (
     PRIMARY KEY (`id`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='google play all_countries_install';
 
+CREATE TABLE IF NOT EXISTS bittorrent_installer_report (
+    `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'primary key',
+    `day` DATE NOT NULL DEFAULT '1970-01-01' COMMENT 'report date',
+    `installer_name` VARCHAR(64) NOT NULL DEFAULT '' COMMENT 'installer name',
+    `geo` VARCHAR(20) NOT NULL DEFAULT '' COMMENT 'country/region code',
+    `installation_started` BIGINT(20) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'installation started count',
+    `installer_success_rate` DECIMAL(10, 4) DEFAULT NULL COMMENT 'installer success rate (%)',
+    `installer_error_rate` DECIMAL(10, 4) DEFAULT NULL COMMENT 'installer error rate (%)',
+    `installer_quit_rate` DECIMAL(10, 4) DEFAULT NULL COMMENT 'installer quit rate (%)',
+    `revenue_per_started` DECIMAL(20, 6) DEFAULT NULL COMMENT 'revenue per started installation',
+    `offers_made` BIGINT(20) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'offers made count',
+    `offers_installs` BIGINT(20) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'offers installs count',
+    `revenue` DECIMAL(20, 6) DEFAULT NULL COMMENT 'total revenue',
+    `installation_completed` BIGINT(20) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'installation completed count',
+    `revenue_per_completed` DECIMAL(20, 6) DEFAULT NULL COMMENT 'revenue per completed installation',
+    PRIMARY KEY (`id`),
+    INDEX day_installer_geo_idx(`day`, `installer_name`, `geo`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='bittorrent installer report';
