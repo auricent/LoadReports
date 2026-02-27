@@ -186,6 +186,39 @@ CREATE TABLE IF NOT EXISTS google_play_all_countries_install (
     PRIMARY KEY (`id`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='google play all_countries_install';
 
+CREATE TABLE IF NOT EXISTS paypro_report (
+    `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'primary key',
+    `day` DATE NOT NULL DEFAULT '1970-01-01' COMMENT 'report date',
+    `order_id` INT(11) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'order id',
+    `order_status_id` INT(11) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'order status id',
+    `order_status_name` VARCHAR(64) NOT NULL DEFAULT '' COMMENT 'order status name',
+    `payment_method_id` INT(11) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'payment method id',
+    `payment_method_name` VARCHAR(64) NOT NULL DEFAULT '' COMMENT 'payment method name',
+    `created_at` DATETIME NOT NULL DEFAULT '1970-01-01 00:00:00' COMMENT 'order created time',
+    `billing_currency_code` VARCHAR(10) NOT NULL DEFAULT '' COMMENT 'billing currency code',
+    `balance_currency_code` VARCHAR(10) NOT NULL DEFAULT '' COMMENT 'balance currency code',
+    `country` VARCHAR(20) NOT NULL DEFAULT '' COMMENT 'country code',
+    `billing_price` DECIMAL(20, 6) NOT NULL DEFAULT '0' COMMENT 'billing price',
+    `product_id` INT(11) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'product id',
+    `order_item_name` VARCHAR(256) NOT NULL DEFAULT '' COMMENT 'order item name',
+    `billing_price_tax_refund` DECIMAL(20, 6) NOT NULL DEFAULT '0' COMMENT 'billing price tax refund',
+    `billing_price_refund` DECIMAL(20, 6) NOT NULL DEFAULT '0' COMMENT 'billing price refund',
+    `balance_vendor_amount` DECIMAL(20, 6) NOT NULL DEFAULT '0' COMMENT 'balance vendor amount',
+    `balance_pay_pro_amount` DECIMAL(20, 6) NOT NULL DEFAULT '0' COMMENT 'balance PayPro amount',
+    PRIMARY KEY (`id`),
+    INDEX day_order_idx(`day`, `order_id`),
+    INDEX day_country_idx(`day`, `country`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='PayPro payment report';
+
+CREATE TABLE IF NOT EXISTS add_torrent (
+    `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'primary key',
+    `day` DATE NOT NULL DEFAULT '1970-01-01' COMMENT 'report date',
+    `events` BIGINT(20) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'number of events',
+    `users` BIGINT(20) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'number of users',
+    PRIMARY KEY (`id`),
+    INDEX day_idx(`day`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='add torrent events report';
+
 CREATE TABLE IF NOT EXISTS bittorrent_installer_report (
     `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'primary key',
     `day` DATE NOT NULL DEFAULT '1970-01-01' COMMENT 'report date',

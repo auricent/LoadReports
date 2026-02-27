@@ -18,6 +18,7 @@ from src.processors.smartadserver import SmartAdServerReportProcessor
 from src.processors.freewheel import FreewheelReportProcessor
 from src.processors.applovin import ApplovinMaxReportProcessor
 from src.processors.yandex import YandexReportProcessor
+from src.processors.paypro import PayproReportProcessor
 from src.util.s3_client import S3Client
 from src.util.database import DatabaseClient
 from src.util.logger import get_logger
@@ -53,7 +54,8 @@ class DataProcessor:
             'yandex_aggregation.csv': (AggregationReportProcessor(), 'adn_aggregation_revenue_report'),
             'seedtag.csv': (SeetagReportProcessor(),'seedtag_report'),
             'seedtag_aggregation.csv': (AggregationReportProcessor(), 'adn_aggregation_revenue_report'),
-            # 'addTorrent.csv': (FirebaseProcessor(), 'firebase'),
+            'paypro.csv': (PayproReportProcessor(), 'paypro_report'),
+            'addTorrent.csv': (FirebaseProcessor(), 'add_torrent'),
             # 'all-users-install.csv': (AllUsersInstallProcessor(), 'google_play_all_users_install'),
             # 'new-users-install.csv': (NewUsersInstallProcessor(), 'google_play_new_users_install'),
             # 'all-countries-install.csv': (GeoAllUsersInstallProcessor(), 'google_play_all_countries_install'),
