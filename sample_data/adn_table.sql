@@ -219,6 +219,17 @@ CREATE TABLE IF NOT EXISTS add_torrent (
     INDEX day_idx(`day`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='add torrent events report';
 
+CREATE TABLE IF NOT EXISTS usa_today_report (
+    `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'primary key',
+    `day` DATE NOT NULL DEFAULT '1970-01-01' COMMENT 'report date',
+    `ad_unit` VARCHAR(256) NOT NULL DEFAULT '' COMMENT 'ad unit name',
+    `ad_exchange_impressions` BIGINT(20) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'ad exchange impressions',
+    `ad_exchange_revenue` DECIMAL(20, 6) NOT NULL DEFAULT '0' COMMENT 'ad exchange revenue',
+    `ad_exchange_ad_requests` BIGINT(20) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'ad exchange ad requests',
+    PRIMARY KEY (`id`),
+    INDEX day_ad_unit_idx(`day`, `ad_unit`(128))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='USA Today report';
+
 CREATE TABLE IF NOT EXISTS bittorrent_installer_report (
     `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'primary key',
     `day` DATE NOT NULL DEFAULT '1970-01-01' COMMENT 'report date',
