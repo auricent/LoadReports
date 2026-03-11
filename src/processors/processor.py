@@ -168,6 +168,7 @@ class DataProcessor:
     def clear_failed_tasks(self) -> None:
         """清空失败任务列表"""
         self.failed_tasks = []
+        self.agg_deleted = False
     
     def process_bittorrent_file(self, s3_client: S3Client, date_str: str) -> None:
         """
