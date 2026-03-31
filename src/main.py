@@ -8,7 +8,7 @@ from src.util.logger import get_logger
 import argparse
 
 
-def main(start_date_str=None, end_date_str=None):
+def main(start_date_str=None, end_date_str=None, file_filter=None):
     logger = get_logger("main")
     logger.info("Starting ADN Report Processor")
 
@@ -33,7 +33,7 @@ def main(start_date_str=None, end_date_str=None):
         logger.info("Database connected")
         
         try:
-            processor = DataProcessor(s3_client, db_client, slack_notifier)
+            processor = DataProcessor(s3_client, db_client, slack_notifier, file_filter=file_filter)
 
             if start_date_str is None or end_date_str is None:
                 today = datetime.date.today()
@@ -79,7 +79,8 @@ if __name__ == "__main__":
 
     parser.add_argument("--start", type=str, required=False)
     parser.add_argument("--end", type=str, required=False)
+    parser.add_argument("--file", type=str, required=False, help="只处理指定文件，如 HTX_data.csv")
 
     args = parser.parse_args()
 
-    main(args.start, args.end)
+    main(args.start, args.end, args.file)

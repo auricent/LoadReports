@@ -20,6 +20,7 @@ from src.processors.applovin import ApplovinMaxReportProcessor
 from src.processors.yandex import YandexReportProcessor
 from src.processors.paypro import PayproReportProcessor
 from src.processors.usatoday import UsaTodayReportProcessor
+from src.processors.htx import HtxReportProcessor
 from src.util.s3_client import S3Client
 from src.util.database import DatabaseClient
 from src.util.logger import get_logger
@@ -31,10 +32,11 @@ class DataProcessor:
 
     agg_deleted = False
     
-    def __init__(self, s3_client: S3Client, db_client: DatabaseClient, slack_notifier=None):
+    def __init__(self, s3_client: S3Client, db_client: DatabaseClient, slack_notifier=None, file_filter: str = None):
         self.s3_client = s3_client
         self.db_client = db_client
         self.slack_notifier = slack_notifier
+        self.file_filter = file_filter
         self.failed_tasks: List[Dict] = []  # 记录失败的任务
         self.processors: Dict[str, tuple] = {
             "applovinMax.csv": (ApplovinMaxReportProcessor(), 'applovin_max_report'),
@@ -58,6 +60,7 @@ class DataProcessor:
             'paypro.csv': (PayproReportProcessor(), 'paypro_report'),
             'usaToday.csv': (UsaTodayReportProcessor(), 'usa_today_report'),
             'usaToday_aggregation.csv': (AggregationReportProcessor(), 'adn_aggregation_revenue_report'),
+            'HTX_data.csv': (HtxReportProcessor(), 'htx_report'),
             'addTorrent.csv': (FirebaseProcessor(), 'add_torrent'),
             # 'all-users-install.csv': (AllUsersInstallProcessor(), 'google_play_all_users_install'),
             # 'new-users-install.csv': (NewUsersInstallProcessor(), 'google_play_new_users_install'),
@@ -75,6 +78,9 @@ class DataProcessor:
         for file_key in files:
             file_name = os.path.basename(file_key)
             logger.info(f"Processing file: {file_name}")
+
+            if self.file_filter and file_name != self.file_filter:
+                continue
 
             if file_name in self.processors:
                 try:
