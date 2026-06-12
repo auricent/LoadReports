@@ -152,7 +152,7 @@ CREATE TABLE IF NOT EXISTS seedtag_report (
     INDEX day_publisher_adtype_idx(`day`, `publisher_name`, `ad_type`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='seedtag report';
 
-CREATE TABLE IF NOT EXISTS firebase_event_dimensions_daily (
+CREATE TABLE IF NOT EXISTS firebase_event_daily (
     `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'primary key',
     `day` DATE NOT NULL DEFAULT '1970-01-01' COMMENT 'report date',
     `event_name` VARCHAR(128) NOT NULL DEFAULT '' COMMENT 'firebase event name',
@@ -166,7 +166,7 @@ CREATE TABLE IF NOT EXISTS firebase_event_dimensions_daily (
     PRIMARY KEY (`id`),
     INDEX day_event_idx(`day`, `event_name`),
     INDEX day_country_version_idx(`day`, `country`, `app_version`)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='firebase event dimensions daily report';
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='firebase event daily report';
 
 
 CREATE TABLE IF NOT EXISTS google_play_all_users_install (

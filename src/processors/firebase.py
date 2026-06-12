@@ -48,4 +48,4 @@ class FirebaseProcessor(ReportProcessor):
         return reports
 
     def get_target_table(self) -> str:
-        return "firebase_event_dimensions_daily"
+        return "firebase_event_daily"

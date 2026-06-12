@@ -61,7 +61,7 @@ class DataProcessor:
             'usaToday.csv': (UsaTodayReportProcessor(), 'usa_today_report'),
             'usaToday_aggregation.csv': (AggregationReportProcessor(), 'adn_aggregation_revenue_report'),
             'HTX_data.csv': (HtxReportProcessor(), 'htx_report'),
-            'firebase_event_dimensions_daily.csv': (FirebaseProcessor(), 'firebase_event_dimensions_daily'),
+            'firebase_event_daily.csv': (FirebaseProcessor(), 'firebase_event_daily'),
             # 'all-users-install.csv': (AllUsersInstallProcessor(), 'google_play_all_users_install'),
             # 'new-users-install.csv': (NewUsersInstallProcessor(), 'google_play_new_users_install'),
             # 'all-countries-install.csv': (GeoAllUsersInstallProcessor(), 'google_play_all_countries_install'),
