@@ -152,13 +152,21 @@ CREATE TABLE IF NOT EXISTS seedtag_report (
     INDEX day_publisher_adtype_idx(`day`, `publisher_name`, `ad_type`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='seedtag report';
 
-CREATE TABLE IF NOT EXISTS firebase (
+CREATE TABLE IF NOT EXISTS firebase_event_daily (
     `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'primary key',
     `day` DATE NOT NULL DEFAULT '1970-01-01' COMMENT 'report date',
-    `events` BIGINT(20) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'number of events',
-    `users` BIGINT(20) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'number of users',
-    PRIMARY KEY (`id`)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='firebase';
+    `event_name` VARCHAR(128) NOT NULL DEFAULT '' COMMENT 'firebase event name',
+    `platform` VARCHAR(32) NOT NULL DEFAULT '' COMMENT 'platform',
+    `operating_system` VARCHAR(64) NOT NULL DEFAULT '' COMMENT 'operating system',
+    `app_version` VARCHAR(64) NOT NULL DEFAULT '' COMMENT 'app version',
+    `country` VARCHAR(128) NOT NULL DEFAULT '' COMMENT 'country',
+    `event_count` BIGINT(20) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'number of events',
+    `total_users` BIGINT(20) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'number of total users',
+    `active_users` BIGINT(20) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'number of active users',
+    PRIMARY KEY (`id`),
+    INDEX day_event_idx(`day`, `event_name`),
+    INDEX day_country_version_idx(`day`, `country`, `app_version`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='firebase event daily report';
 
 
 CREATE TABLE IF NOT EXISTS google_play_all_users_install (
@@ -210,15 +218,6 @@ CREATE TABLE IF NOT EXISTS paypro_report (
     INDEX day_order_idx(`day`, `order_id`),
     INDEX day_country_idx(`day`, `country`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='PayPro payment report';
-
-CREATE TABLE IF NOT EXISTS add_torrent (
-    `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'primary key',
-    `day` DATE NOT NULL DEFAULT '1970-01-01' COMMENT 'report date',
-    `events` BIGINT(20) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'number of events',
-    `users` BIGINT(20) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'number of users',
-    PRIMARY KEY (`id`),
-    INDEX day_idx(`day`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='add torrent events report';
 
 CREATE TABLE IF NOT EXISTS usa_today_report (
     `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'primary key',

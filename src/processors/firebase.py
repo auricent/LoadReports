@@ -7,6 +7,12 @@ from src.models.firebase import FirebaseReport
 from src.processors.base import ReportProcessor
 
 
+def parse_int(value) -> int:
+    if value is None or value == '':
+        return 0
+    return int(value)
+
+
 class FirebaseProcessor(ReportProcessor):
 
     def process_data(self, file_path: str) -> List[ReportData]:
@@ -22,8 +28,14 @@ class FirebaseProcessor(ReportProcessor):
 
                     report = FirebaseReport(
                         day=day,
-                        events=row.get('events', 0),
-                        users=row.get('users', 0)
+                        event_name=row.get('event_name', ''),
+                        platform=row.get('platform', ''),
+                        operating_system=row.get('operating_system', ''),
+                        app_version=row.get('app_version', ''),
+                        country=row.get('country', ''),
+                        event_count=parse_int(row.get('event_count')),
+                        total_users=parse_int(row.get('total_users')),
+                        active_users=parse_int(row.get('active_users'))
                     )
                     reports.append(report)
                 except (ValueError, KeyError) as e:
@@ -36,4 +48,4 @@ class FirebaseProcessor(ReportProcessor):
         return reports
 
     def get_target_table(self) -> str:
-        return "firebase"
+        return "firebase_event_daily"

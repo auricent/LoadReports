@@ -7,6 +7,7 @@ from src.models.xaprio import XaprioReport
 from src.models.smartadserver import SmartAdServerReport
 from src.models.freewheel import FreewheelReport
 from src.models.applovin import ApplovinMaxReport
+from src.models.firebase import FirebaseReport
 
 __all__ = [
     'ReportData', 
@@ -17,5 +18,6 @@ __all__ = [
     'XaprioReport',
     'SmartAdServerReport',
     'FreewheelReport',
-    'ApplovinMaxReport'
+    'ApplovinMaxReport',
+    'FirebaseReport'
 ]
