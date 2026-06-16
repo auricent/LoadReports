@@ -8,6 +8,7 @@ from src.models.smartadserver import SmartAdServerReport
 from src.models.freewheel import FreewheelReport
 from src.models.applovin import ApplovinMaxReport
 from src.models.firebase import FirebaseReport
+from src.models.addTorrent import AddTorrentReport
 
 __all__ = [
     'ReportData', 
@@ -19,5 +20,6 @@ __all__ = [
     'SmartAdServerReport',
     'FreewheelReport',
     'ApplovinMaxReport',
-    'FirebaseReport'
+    'FirebaseReport',
+    'AddTorrentReport'
 ]

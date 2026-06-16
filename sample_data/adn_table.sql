@@ -168,6 +168,15 @@ CREATE TABLE IF NOT EXISTS firebase_event_daily (
     INDEX day_country_version_idx(`day`, `country`, `app_version`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='firebase event daily report';
 
+CREATE TABLE IF NOT EXISTS add_torrent (
+    `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'primary key',
+    `day` DATE NOT NULL DEFAULT '1970-01-01' COMMENT 'report date',
+    `events` BIGINT(20) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'number of events',
+    `users` BIGINT(20) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'number of users',
+    PRIMARY KEY (`id`),
+    INDEX day_idx(`day`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='add torrent events report';
+
 
 CREATE TABLE IF NOT EXISTS google_play_all_users_install (
     `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'primary key',

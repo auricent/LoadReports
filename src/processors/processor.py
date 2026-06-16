@@ -7,6 +7,7 @@ from src.processors.allUsersInstall import AllUsersInstallProcessor
 from src.processors.bidmatic import BidmaticReportProcessor
 from src.processors.aggregation import AggregationReportProcessor
 from src.processors.bittorrent import BittorrentInstallerProcessor
+from src.processors.addTorrent import AddTorrentProcessor
 from src.processors.didna import DidnaReportProcessor
 from src.processors.cpmstar import CpmstarReportProcessor
 from src.processors.firebase import FirebaseProcessor
@@ -62,6 +63,7 @@ class DataProcessor:
             'usaToday_aggregation.csv': (AggregationReportProcessor(), 'adn_aggregation_revenue_report'),
             'HTX_data.csv': (HtxReportProcessor(), 'htx_report'),
             'firebase_event_daily.csv': (FirebaseProcessor(), 'firebase_event_daily'),
+            'addTorrent.csv': (AddTorrentProcessor(), 'add_torrent'),
             # 'all-users-install.csv': (AllUsersInstallProcessor(), 'google_play_all_users_install'),
             # 'new-users-install.csv': (NewUsersInstallProcessor(), 'google_play_new_users_install'),
             # 'all-countries-install.csv': (GeoAllUsersInstallProcessor(), 'google_play_all_countries_install'),
