@@ -36,6 +36,7 @@ class PayproReportProcessor(ReportProcessor):
                         billing_price=Decimal(row.get('billingPrice', '0')),
                         product_id=int(row.get('productId', 0)),
                         order_item_name=row.get('orderItemName', ''),
+                        subscription_billing_cycle=row.get('subscriptionBillingCycle', ''),
                         billing_price_tax_refund=Decimal(row.get('billingPriceTaxRefund', '0')),
                         billing_price_refund=Decimal(row.get('billingPriceRefund', '0')),
                         balance_vendor_amount=Decimal(row.get('balanceVendorAmount', '0')),

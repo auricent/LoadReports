@@ -219,6 +219,7 @@ CREATE TABLE IF NOT EXISTS paypro_report (
     `billing_price` DECIMAL(20, 6) NOT NULL DEFAULT '0' COMMENT 'billing price',
     `product_id` INT(11) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'product id',
     `order_item_name` VARCHAR(256) NOT NULL DEFAULT '' COMMENT 'order item name',
+    `subscription_billing_cycle` VARCHAR(64) NOT NULL DEFAULT '' COMMENT 'subscription billing cycle',
     `billing_price_tax_refund` DECIMAL(20, 6) NOT NULL DEFAULT '0' COMMENT 'billing price tax refund',
     `billing_price_refund` DECIMAL(20, 6) NOT NULL DEFAULT '0' COMMENT 'billing price refund',
     `balance_vendor_amount` DECIMAL(20, 6) NOT NULL DEFAULT '0' COMMENT 'balance vendor amount',

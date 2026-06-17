@@ -19,6 +19,7 @@ class PayproReport(ReportData):
     billing_price: Decimal
     product_id: int
     order_item_name: str
+    subscription_billing_cycle: str
     billing_price_tax_refund: Decimal
     billing_price_refund: Decimal
     balance_vendor_amount: Decimal
@@ -39,6 +40,7 @@ class PayproReport(ReportData):
             "billing_price": self.billing_price,
             "product_id": self.product_id,
             "order_item_name": self.order_item_name,
+            "subscription_billing_cycle": self.subscription_billing_cycle,
             "billing_price_tax_refund": self.billing_price_tax_refund,
             "billing_price_refund": self.billing_price_refund,
             "balance_vendor_amount": self.balance_vendor_amount,
