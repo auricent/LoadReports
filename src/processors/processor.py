@@ -22,6 +22,7 @@ from src.processors.yandex import YandexReportProcessor
 from src.processors.paypro import PayproReportProcessor
 from src.processors.usatoday import UsaTodayReportProcessor
 from src.processors.htx import HtxReportProcessor
+from src.processors.vdoai import VdoaiReportProcessor
 from src.util.s3_client import S3Client
 from src.util.database import DatabaseClient
 from src.util.logger import get_logger
@@ -64,9 +65,14 @@ class DataProcessor:
             'HTX_data.csv': (HtxReportProcessor(), 'htx_report'),
             'firebase_event_daily.csv': (FirebaseProcessor(), 'firebase_event_daily'),
             'addTorrent.csv': (AddTorrentProcessor(), 'add_torrent'),
+            'vdoai.csv': (VdoaiReportProcessor(), 'vdoai_report'),
+            'vdoai_aggregation.csv': (AggregationReportProcessor(), 'adn_aggregation_revenue_report'),
             # 'all-users-install.csv': (AllUsersInstallProcessor(), 'google_play_all_users_install'),
             # 'new-users-install.csv': (NewUsersInstallProcessor(), 'google_play_new_users_install'),
             # 'all-countries-install.csv': (GeoAllUsersInstallProcessor(), 'google_play_all_countries_install'),
+        }
+        self.date_columns = {
+            'vdoai_report': 'dt',
         }
     
     def register_processor(self, file_pattern: str, processor: tuple) -> None:
@@ -124,7 +130,7 @@ class DataProcessor:
                 self.agg_deleted=True
             elif not file_name.endswith('_aggregation.csv'):
                 logger.info(f"delete data of  {table_name} in {date_str}")
-                self.db_client.delete_data(table_name, 'day', date_str)
+                self.db_client.delete_data(table_name, self.date_columns.get(table_name, 'day'), date_str)
 
             logger.info(f"Inserting {len(reports)} reports into {table_name}")
             self.db_client.batch_insert_reports(table_name, reports)

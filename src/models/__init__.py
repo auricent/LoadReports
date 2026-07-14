@@ -9,6 +9,7 @@ from src.models.freewheel import FreewheelReport
 from src.models.applovin import ApplovinMaxReport
 from src.models.firebase import FirebaseReport
 from src.models.addTorrent import AddTorrentReport
+from src.models.vdoai import VdoaiReport
 
 __all__ = [
     'ReportData', 
@@ -21,5 +22,6 @@ __all__ = [
     'FreewheelReport',
     'ApplovinMaxReport',
     'FirebaseReport',
-    'AddTorrentReport'
+    'AddTorrentReport',
+    'VdoaiReport'
 ]
