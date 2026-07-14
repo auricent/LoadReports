@@ -124,10 +124,8 @@ class DataProcessor:
         if reports:
             date_str = s3_prefix.split("/")[-1]
 
-            if file_name.endswith('_aggregation.csv') and not self.agg_deleted:
-                logger.info(f"delete data of  adn_aggregation_revenue_report in {date_str}")
-                self.db_client.delete_data("adn_aggregation_revenue_report", 'day', date_str)
-                self.agg_deleted=True
+            if file_name.endswith('_aggregation.csv'):
+                self._delete_aggregation_data(reports, date_str)
             elif not file_name.endswith('_aggregation.csv'):
                 logger.info(f"delete data of  {table_name} in {date_str}")
                 self.db_client.delete_data(table_name, self.date_columns.get(table_name, 'day'), date_str)
@@ -139,7 +137,23 @@ class DataProcessor:
 
         # os.remove(local_path)
         logger.info(f"Finished processing {file_name}")
-    
+
+    def _delete_aggregation_data(self, reports, date_str: str) -> None:
+        if self.file_filter:
+            adn_networks = sorted({report.adn_network for report in reports if report.adn_network})
+            if not adn_networks:
+                raise ValueError("Aggregation report has no adn_network values")
+
+            for adn_network in adn_networks:
+                logger.info(f"delete data of adn_aggregation_revenue_report for {adn_network} in {date_str}")
+                self.db_client.delete_agg_data("adn_aggregation_revenue_report", adn_network, 'day', date_str)
+            return
+
+        if not self.agg_deleted:
+            logger.info(f"delete data of  adn_aggregation_revenue_report in {date_str}")
+            self.db_client.delete_data("adn_aggregation_revenue_report", 'day', date_str)
+            self.agg_deleted = True
+
     def _send_task_failure_alert(self, error_info: Dict) -> None:
         """发送单个任务失败告警"""
         if not self.slack_notifier:
