@@ -57,7 +57,7 @@ class DataProcessor:
             'freewheel_aggregation.csv': (AggregationReportProcessor(), 'adn_aggregation_revenue_report'),
             'yandex.csv': (YandexReportProcessor(),'yandex_report'),
             'yandex_aggregation.csv': (AggregationReportProcessor(), 'adn_aggregation_revenue_report'),
-            'seedtag.csv': (SeetagReportProcessor(),'seedtag_report'),
+            'seedtag.csv': (SeetagReportProcessor(), 'seedtag_report'),
             'seedtag_aggregation.csv': (AggregationReportProcessor(), 'adn_aggregation_revenue_report'),
             'paypro.csv': (PayproReportProcessor(), 'paypro_report'),
             'usaToday.csv': (UsaTodayReportProcessor(), 'usa_today_report'),

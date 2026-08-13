@@ -13,20 +13,25 @@ class SeetagReportProcessor(ReportProcessor):
         reports = []
         failed_rows = []
 
-        with open(file_path, 'r', encoding='utf-8') as csvfile:
+        with open(file_path, 'r', encoding='utf-8-sig', newline='') as csvfile:
             reader = csv.DictReader(csvfile)
+            required_fields = {'day', 'publisher_name', 'ad_type', 'country', 'clicks', 'impressions', 'revenue'}
+            missing_fields = required_fields - set(reader.fieldnames or [])
+            if missing_fields:
+                raise ValueError(f"Missing required columns: {', '.join(sorted(missing_fields))}")
+
             for row_num, row in enumerate(reader, start=2):
                 try:
-                    day_str = row.get('day', '1970-01-01')
-                    day = datetime.strptime(day_str, '%Y-%m-%d').date()
+                    day = datetime.strptime(row['day'], '%Y-%m-%d').date()
 
                     report = SeetagReport(
                         day=day,
-                        publisher_name=row.get('publisher_name', ''),
-                        ad_type=row.get('ad_type', ''),
-                        clicks=int(row.get('clicks', 0)),
-                        impressions=int(row.get('impressions', 0)),
-                        revenue=float(row.get('revenue', 0.0))
+                        publisher_name=row['publisher_name'],
+                        ad_type=row['ad_type'],
+                        country=row['country'],
+                        clicks=int(row['clicks'] or 0),
+                        impressions=int(row['impressions'] or 0),
+                        revenue=float(row['revenue'] or 0.0)
                     )
                     reports.append(report)
                 except (ValueError, KeyError) as e:

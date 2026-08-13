@@ -145,11 +145,12 @@ CREATE TABLE IF NOT EXISTS seedtag_report (
     `day` DATE NOT NULL DEFAULT '1970-01-01' COMMENT 'report date',
     `publisher_name` VARCHAR(128) NOT NULL DEFAULT '0' COMMENT 'app name',
     `ad_type` VARCHAR(20) NOT NULL DEFAULT '' COMMENT 'ad type',
+    `country` VARCHAR(20) NOT NULL DEFAULT '' COMMENT 'country code',
     `clicks` BIGINT(20) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'clicks',
     `impressions` BIGINT(20) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'impressions',
     `revenue` DECIMAL(20, 6) NOT NULL DEFAULT '0' COMMENT 'revenue',
     PRIMARY KEY (`id`),
-    INDEX day_publisher_adtype_idx(`day`, `publisher_name`, `ad_type`)
+    INDEX day_publisher_adtype_country_idx(`day`, `publisher_name`, `ad_type`, `country`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='seedtag report';
 
 CREATE TABLE IF NOT EXISTS firebase_event_daily (
@@ -251,6 +252,21 @@ CREATE TABLE IF NOT EXISTS htx_report (
     PRIMARY KEY (`id`),
     INDEX day_insertion_idx(`day`, `insertion_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='HTX report';
+
+CREATE TABLE IF NOT EXISTS `vdoai_report` (
+    `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'primary key',
+    `dt` DATE NOT NULL DEFAULT '1970-01-01' COMMENT 'report date',
+    `website` VARCHAR(256) NOT NULL DEFAULT '' COMMENT 'website',
+    `tag` VARCHAR(128) NOT NULL DEFAULT '' COMMENT 'tag',
+    `revenue` DECIMAL(20, 6) NOT NULL DEFAULT '0.000000' COMMENT 'revenue',
+    `unit_pageview_match` BIGINT(20) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'unit pageview match',
+    `pageview_match` BIGINT(20) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'pageview match',
+    `viewability` DECIMAL(10, 4) NOT NULL DEFAULT '0.0000' COMMENT 'viewability',
+    `matched_pageview_cpm` DECIMAL(20, 6) NOT NULL DEFAULT '0.000000' COMMENT 'matched pageview cpm',
+    `unit_matched_pageview_cpm` DECIMAL(20, 6) NOT NULL DEFAULT '0.000000' COMMENT 'unit matched pageview cpm',
+    PRIMARY KEY (`id`),
+    KEY `idx_dt_tag` (`dt`, `tag`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='VDO.AI revenue report';
 
 CREATE TABLE IF NOT EXISTS bittorrent_installer_report (
     `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'primary key',

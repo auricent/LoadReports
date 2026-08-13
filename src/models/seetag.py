@@ -7,6 +7,7 @@ from src.models.base import ReportData
 class SeetagReport(ReportData):
     publisher_name: str
     ad_type: str
+    country: str
     clicks: int
     impressions: int
     revenue: float
@@ -16,6 +17,7 @@ class SeetagReport(ReportData):
             "day": self.day,
             "publisher_name": self.publisher_name,
             "ad_type": self.ad_type,
+            "country": self.country,
             "clicks": self.clicks,
             "impressions": self.impressions,
             "revenue": self.revenue
