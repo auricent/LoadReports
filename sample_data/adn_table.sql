@@ -268,6 +268,19 @@ CREATE TABLE IF NOT EXISTS `vdoai_report` (
     KEY `idx_dt_tag` (`dt`, `tag`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='VDO.AI revenue report';
 
+CREATE TABLE IF NOT EXISTS vertoz_report (
+    `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'primary key',
+    `day` DATE NOT NULL DEFAULT '1970-01-01' COMMENT 'report date',
+    `channel_name` VARCHAR(256) NOT NULL DEFAULT '' COMMENT 'channel name',
+    `country` VARCHAR(20) NOT NULL DEFAULT '' COMMENT 'country code',
+    `cpm` DECIMAL(20, 6) NOT NULL DEFAULT '0' COMMENT 'CPM',
+    `requests` BIGINT(20) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'requests',
+    `impressions` BIGINT(20) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'impressions',
+    `revenue` DECIMAL(20, 6) NOT NULL DEFAULT '0' COMMENT 'revenue after revenue share',
+    PRIMARY KEY (`id`),
+    INDEX day_country_channel_idx(`day`, `country`, `channel_name`(128))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Vertoz revenue report';
+
 CREATE TABLE IF NOT EXISTS bittorrent_installer_report (
     `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'primary key',
     `day` DATE NOT NULL DEFAULT '1970-01-01' COMMENT 'report date',

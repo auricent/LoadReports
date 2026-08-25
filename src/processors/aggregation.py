@@ -8,6 +8,9 @@ from src.processors.base import ReportProcessor
 
 
 class AggregationReportProcessor(ReportProcessor):
+
+    def __init__(self, revenue_multiplier: float = 1.0):
+        self.revenue_multiplier = revenue_multiplier
     
     def process_data(self, file_path: str) -> List[ReportData]:
         reports = []
@@ -33,7 +36,7 @@ class AggregationReportProcessor(ReportProcessor):
                         os_type=row.get('os_type', ''),
                         ad_type=row.get('ad_type', ''),
                         ad_size=row.get('ad_size', ''),
-                        revenue=float(row.get('revenue', 0.0)),
+                        revenue=float(row.get('revenue', 0.0)) * self.revenue_multiplier,
                         requests=int(row.get('requests', 0)),
                         responses=int(row.get('responses', 0)),
                         clicks=int(row.get('clicks', 0)),
