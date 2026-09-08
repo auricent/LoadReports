@@ -10,6 +10,7 @@ from src.models.applovin import ApplovinMaxReport
 from src.models.firebase import FirebaseReport
 from src.models.addTorrent import AddTorrentReport
 from src.models.vdoai import VdoaiReport
+from src.models.betweenx import BetweenxReport
 
 __all__ = [
     'ReportData', 
@@ -23,5 +24,6 @@ __all__ = [
     'ApplovinMaxReport',
     'FirebaseReport',
     'AddTorrentReport',
-    'VdoaiReport'
+    'VdoaiReport',
+    'BetweenxReport'
 ]

@@ -281,6 +281,22 @@ CREATE TABLE IF NOT EXISTS vertoz_report (
     INDEX day_country_channel_idx(`day`, `country`, `channel_name`(128))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Vertoz revenue report';
 
+CREATE TABLE IF NOT EXISTS betweenx_report (
+    `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'primary key',
+    `day` DATE NOT NULL DEFAULT '1970-01-01' COMMENT 'report date',
+    `site_id` BIGINT(20) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'site id',
+    `requests` BIGINT(20) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'requests',
+    `views` BIGINT(20) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'views',
+    `view_rate` DECIMAL(20, 6) NOT NULL DEFAULT '0' COMMENT 'view rate',
+    `clicks` BIGINT(20) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'clicks',
+    `impressions` BIGINT(20) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'impressions',
+    `revenue` DECIMAL(20, 6) NOT NULL DEFAULT '0' COMMENT 'revenue',
+    `revenue_usd` DECIMAL(20, 6) NOT NULL DEFAULT '0' COMMENT 'revenue in USD',
+    `ecpm_usd` DECIMAL(20, 6) NOT NULL DEFAULT '0' COMMENT 'eCPM in USD',
+    PRIMARY KEY (`id`),
+    INDEX day_site_id_idx(`day`, `site_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='betweenx report';
+
 CREATE TABLE IF NOT EXISTS bittorrent_installer_report (
     `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'primary key',
     `day` DATE NOT NULL DEFAULT '1970-01-01' COMMENT 'report date',

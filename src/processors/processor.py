@@ -24,6 +24,7 @@ from src.processors.usatoday import UsaTodayReportProcessor
 from src.processors.htx import HtxReportProcessor
 from src.processors.vdoai import VdoaiReportProcessor
 from src.processors.vertoz import VertozReportProcessor
+from src.processors.betweenx import BetweenxReportProcessor
 from src.util.s3_client import S3Client
 from src.util.database import DatabaseClient
 from src.util.logger import get_logger
@@ -70,6 +71,8 @@ class DataProcessor:
             'vdoai_aggregation.csv': (AggregationReportProcessor(), 'adn_aggregation_revenue_report'),
             'vertoz.csv': (VertozReportProcessor(), 'vertoz_report'),
             'vertoz_aggregation.csv': (AggregationReportProcessor(0.8), 'adn_aggregation_revenue_report'),
+            'betweenx.csv': (BetweenxReportProcessor(), 'betweenx_report'),
+            'betweenx_aggregation.csv': (AggregationReportProcessor(), 'adn_aggregation_revenue_report'),
             # 'all-users-install.csv': (AllUsersInstallProcessor(), 'google_play_all_users_install'),
             # 'new-users-install.csv': (NewUsersInstallProcessor(), 'google_play_new_users_install'),
             # 'all-countries-install.csv': (GeoAllUsersInstallProcessor(), 'google_play_all_countries_install'),
