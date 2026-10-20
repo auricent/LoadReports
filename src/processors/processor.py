@@ -3,6 +3,8 @@ import re
 import traceback
 from typing import Dict, Optional, List
 
+from botocore.exceptions import ClientError
+
 from src.processors.allUsersInstall import AllUsersInstallProcessor
 from src.processors.bidmatic import BidmaticReportProcessor
 from src.processors.aggregation import AggregationReportProcessor
@@ -96,6 +98,9 @@ class DataProcessor:
             if self.file_filter and file_name != self.file_filter:
                 continue
 
+            if file_name == 'firebase_event_daily.complete.json':
+                continue
+
             if file_name in self.processors:
                 try:
                     self._process_single_file(file_key, file_name, s3_prefix)
@@ -126,6 +131,23 @@ class DataProcessor:
         self.s3_client.download_file(file_key, local_path)
 
         reports = processor.process_data(local_path)
+
+        if file_name == 'firebase_event_daily.csv':
+            date_str = s3_prefix.split('/')[-1]
+            completion = {'apps': {}, 'source_sha256': ''}
+            manifest_key = file_key.rsplit('/', 1)[0] + '/firebase_event_daily.complete.json'
+            manifest_path = local_path + '.complete.json'
+            try:
+                self.s3_client.download_file(manifest_key, manifest_path)
+            except ClientError as exc:
+                if exc.response.get('Error', {}).get('Code') not in ('404', 'NoSuchKey', 'NotFound'):
+                    raise
+                logger.warning('Firebase completion manifest missing; zero-user days remain unconfirmed')
+            else:
+                completion = processor.process_completion_manifest(local_path, manifest_path, date_str, reports)
+            self.db_client.replace_firebase_day(date_str, reports, **completion)
+            logger.info(f'Finished processing Firebase events and completion state for {date_str}')
+            return
 
         if reports:
             date_str = s3_prefix.split("/")[-1]

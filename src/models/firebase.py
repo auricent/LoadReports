@@ -14,6 +14,8 @@ class FirebaseReport(ReportData):
     event_count: int
     total_users: int
     active_users: int
+    stream_id: str = ''
+    app_id: str = ''
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -25,5 +27,7 @@ class FirebaseReport(ReportData):
             "country": self.country,
             "event_count": self.event_count,
             "total_users": self.total_users,
-            "active_users": self.active_users
+            "active_users": self.active_users,
+            "stream_id": self.stream_id,
+            "app_id": self.app_id
         }
