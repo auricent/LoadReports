@@ -153,6 +153,16 @@ CREATE TABLE IF NOT EXISTS seedtag_report (
     INDEX day_publisher_adtype_country_idx(`day`, `publisher_name`, `ad_type`, `country`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='seedtag report';
 
+CREATE TABLE IF NOT EXISTS firebase_collection_daily (
+    `day` DATE NOT NULL,
+    `stream_id` VARCHAR(64) NOT NULL,
+    `app_id` VARCHAR(255) NOT NULL,
+    `source_sha256` CHAR(64) NOT NULL,
+    `imported_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`day`, `stream_id`),
+    INDEX day_app_idx (`day`, `app_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 CREATE TABLE IF NOT EXISTS firebase_event_daily (
     `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'primary key',
     `day` DATE NOT NULL DEFAULT '1970-01-01' COMMENT 'report date',
@@ -164,7 +174,10 @@ CREATE TABLE IF NOT EXISTS firebase_event_daily (
     `event_count` BIGINT(20) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'number of events',
     `total_users` BIGINT(20) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'number of total users',
     `active_users` BIGINT(20) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'number of active users',
+    `stream_id` VARCHAR(64) NOT NULL DEFAULT '' COMMENT 'GA4 data stream ID',
+    `app_id` VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'Apple bundle ID or Android package name',
     PRIMARY KEY (`id`),
+    INDEX day_app_event_idx(`day`, `app_id`, `event_name`),
     INDEX day_event_idx(`day`, `event_name`),
     INDEX day_country_version_idx(`day`, `country`, `app_version`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='firebase event daily report';

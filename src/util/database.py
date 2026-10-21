@@ -87,3 +87,34 @@ class DatabaseClient:
         logger.info(f"Batch inserting {len(reports)} reports into {table_name}")
         data_dicts = [report.to_dict() for report in reports]
         self.insert_data(table_name, data_dicts)
+
+    def replace_firebase_day(self, day: str, reports: List[ReportData], apps: Dict[str, str], source_sha256: str) -> None:
+        if not self.connection or not self.connection.is_connected():
+            raise Exception('Database not connected')
+        if any(str(report.day) != day for report in reports):
+            raise ValueError('Firebase CSV contains a different report date')
+
+        cursor = self.connection.cursor()
+        try:
+            cursor.execute('DELETE FROM firebase_event_daily WHERE day = %s', (day,))
+            if reports:
+                data = [report.to_dict() for report in reports]
+                columns = list(data[0])
+                column_names = ', '.join(f'`{column}`' for column in columns)
+                placeholders = ', '.join(['%s'] * len(columns))
+                cursor.executemany(
+                    f'INSERT INTO firebase_event_daily ({column_names}) VALUES ({placeholders})',
+                    [tuple(row[column] for column in columns) for row in data],
+                )
+            cursor.execute('DELETE FROM firebase_collection_daily WHERE day = %s', (day,))
+            if apps:
+                cursor.executemany(
+                    'INSERT INTO firebase_collection_daily (day, stream_id, app_id, source_sha256) VALUES (%s, %s, %s, %s)',
+                    [(day, stream, app, source_sha256) for stream, app in apps.items()],
+                )
+            self.connection.commit()
+        except Exception:
+            self.connection.rollback()
+            raise
+        finally:
+            cursor.close()
