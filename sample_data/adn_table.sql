@@ -182,6 +182,9 @@ CREATE TABLE IF NOT EXISTS firebase_event_daily (
     INDEX day_country_version_idx(`day`, `country`, `app_version`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='firebase event daily report';
 
+CREATE TABLE IF NOT EXISTS firebase_app_event_daily LIKE firebase_event_daily;
+CREATE TABLE IF NOT EXISTS firebase_app_collection_daily LIKE firebase_collection_daily;
+
 CREATE TABLE IF NOT EXISTS add_torrent (
     `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'primary key',
     `day` DATE NOT NULL DEFAULT '1970-01-01' COMMENT 'report date',

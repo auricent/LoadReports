@@ -8,7 +8,7 @@ import pytest
 from botocore.exceptions import ClientError
 
 from src.models.firebase import FirebaseReport
-from src.processors.firebase import FirebaseProcessor
+from src.processors.firebase import FirebaseProcessor, FirebaseAppEventProcessor
 from src.processors.processor import DataProcessor
 from src.util.database import DatabaseClient
 
@@ -48,6 +48,10 @@ class SQLiteConnection:
                 PRIMARY KEY(day, stream_id)
             );
         ''')
+        for old, new in [('firebase_event_daily', 'firebase_app_event_daily'),
+                         ('firebase_collection_daily', 'firebase_app_collection_daily')]:
+            schema = self.raw.execute('SELECT sql FROM sqlite_master WHERE name = ?', (old,)).fetchone()[0]
+            self.raw.execute(schema.replace(old, new))
 
     def is_connected(self):
         return True
@@ -154,18 +158,21 @@ def test_csv_with_wrong_date_is_rejected_before_delete(database):
     assert database.connection.raw.execute('SELECT event_count FROM firebase_event_daily').fetchone()[0] == 10
 
 
-def run_s3_import(monkeypatch, database, manifest_error=None, corrupt_hash=False):
+def run_s3_import(monkeypatch, database, manifest_error=None, corrupt_hash=False, summary=False, quality_verified=True):
     csv_body = HEADER.encode()
+    filename = 'firebase_app_event_daily' if summary else 'firebase_event_daily'
     manifest_body = json.dumps({
         'schema_version': 1, 'day': DAY,
         'source_sha256': 'bad' if corrupt_hash else hashlib.sha256(csv_body).hexdigest(),
         'apps': {'202': APP},
+        'aggregation': 'app_event' if summary else '',
+        'quality_verified': quality_verified,
     }).encode()
     downloads = []
 
     class MemoryS3:
         def list_files(self, prefix):
-            return [prefix + '/firebase_event_daily.complete.json', prefix + '/firebase_event_daily.csv']
+            return [prefix + '/' + filename + '.complete.json', prefix + '/' + filename + '.csv']
 
         def download_file(self, key, path):
             downloads.append(key)
@@ -175,9 +182,9 @@ def run_s3_import(monkeypatch, database, manifest_error=None, corrupt_hash=False
     original_open = open
 
     def artifact_open(path, mode='r', *args, **kwargs):
-        if str(path) == '/tmp/firebase_event_daily.csv':
+        if str(path) == '/tmp/' + filename + '.csv':
             return io.BytesIO(csv_body) if 'b' in mode else io.StringIO(csv_body.decode())
-        if str(path) == '/tmp/firebase_event_daily.csv.complete.json':
+        if str(path) == '/tmp/' + filename + '.csv.complete.json':
             return io.StringIO(manifest_body.decode())
         return original_open(path, mode, *args, **kwargs)
 
@@ -214,3 +221,49 @@ def test_missing_s3_manifest_does_not_leave_stale_success(monkeypatch, database)
     processor, _ = run_s3_import(monkeypatch, database, manifest_error='NoSuchKey')
     assert processor.failed_tasks == []
     assert database.connection.raw.execute('SELECT COUNT(*) FROM firebase_collection_daily').fetchone()[0] == 0
+
+
+def test_summary_import_is_separate_and_empty_day_is_confirmed(monkeypatch, database):
+    database.replace_firebase_day(DAY, [sample_report()], {'202': APP}, 'a' * 64)
+    database.replace_firebase_day(DAY, [sample_report()], {'202': APP}, 'a' * 64, table_name='firebase_app_event_daily')
+    processor, downloads = run_s3_import(monkeypatch, database, summary=True)
+    assert not processor.failed_tasks
+    assert len(downloads) == 2
+    assert database.connection.raw.execute('SELECT COUNT(*) FROM firebase_app_event_daily').fetchone()[0] == 0
+    assert database.connection.raw.execute('SELECT app_id FROM firebase_app_collection_daily').fetchone()[0] == APP
+    assert database.connection.raw.execute('SELECT event_count FROM firebase_event_daily').fetchone()[0] == 10
+
+
+@pytest.mark.parametrize('failure', ['missing', 'corrupt', 'unverified'])
+def test_summary_import_requires_verified_matching_completion(monkeypatch, database, failure):
+    database.replace_firebase_day(DAY, [sample_report()], {'202': APP}, 'a' * 64, table_name='firebase_app_event_daily')
+    processor, _ = run_s3_import(
+        monkeypatch, database, summary=True,
+        manifest_error='NoSuchKey' if failure == 'missing' else None,
+        corrupt_hash=failure == 'corrupt', quality_verified=failure != 'unverified',
+    )
+    assert len(processor.failed_tasks) == 1
+    assert database.connection.raw.execute('SELECT event_count FROM firebase_app_event_daily').fetchone()[0] == 10
+    assert database.connection.raw.execute('SELECT source_sha256 FROM firebase_app_collection_daily').fetchone()[0] == 'a' * 64
+
+
+@pytest.mark.parametrize('event,version,country', [('(other)', '', ''), ('first_open', '1.3', ''), ('first_open', '', 'US')])
+def test_summary_rejects_collapsed_or_detail_rows(tmp_path, event, version, country):
+    body = HEADER + f'{DAY},{event},iOS,,{version},{country},4,5,5,202,{APP}\n'
+    path, _ = write_pair(tmp_path, body)
+    with pytest.raises(ValueError, match='Invalid Firebase app/event summary row'):
+        FirebaseAppEventProcessor().process_data(str(path))
+
+
+def test_summary_rejects_duplicate_grains(tmp_path):
+    row = f'{DAY},first_open,iOS,,,,4,5,5,202,{APP}\n'
+    path, _ = write_pair(tmp_path, HEADER + row + row)
+    with pytest.raises(ValueError, match='Duplicate'):
+        FirebaseAppEventProcessor().process_data(str(path))
+
+
+def test_summary_database_failure_rolls_back_both_tables(database):
+    database.replace_firebase_day(DAY, [sample_report()], {'202': APP}, 'a' * 64, table_name='firebase_app_event_daily')
+    with pytest.raises(sqlite3.IntegrityError):
+        database.replace_firebase_day(DAY, [], {'202': APP}, 'bad-hash', table_name='firebase_app_event_daily')
+    assert database.connection.raw.execute('SELECT event_count FROM firebase_app_event_daily').fetchone()[0] == 10

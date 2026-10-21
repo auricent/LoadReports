@@ -12,7 +12,7 @@ from src.processors.bittorrent import BittorrentInstallerProcessor
 from src.processors.addTorrent import AddTorrentProcessor
 from src.processors.didna import DidnaReportProcessor
 from src.processors.cpmstar import CpmstarReportProcessor
-from src.processors.firebase import FirebaseProcessor
+from src.processors.firebase import FirebaseProcessor, FirebaseAppEventProcessor
 from src.processors.geoAllUsersInstall import GeoAllUsersInstallProcessor
 from src.processors.newUsersInstall import NewUsersInstallProcessor
 from src.processors.seetag import SeetagReportProcessor
@@ -68,6 +68,7 @@ class DataProcessor:
             'usaToday_aggregation.csv': (AggregationReportProcessor(), 'adn_aggregation_revenue_report'),
             'HTX_data.csv': (HtxReportProcessor(), 'htx_report'),
             'firebase_event_daily.csv': (FirebaseProcessor(), 'firebase_event_daily'),
+            'firebase_app_event_daily.csv': (FirebaseAppEventProcessor(), 'firebase_app_event_daily'),
             'addTorrent.csv': (AddTorrentProcessor(), 'add_torrent'),
             'vdoai.csv': (VdoaiReportProcessor(), 'vdoai_report'),
             'vdoai_aggregation.csv': (AggregationReportProcessor(), 'adn_aggregation_revenue_report'),
@@ -98,7 +99,7 @@ class DataProcessor:
             if self.file_filter and file_name != self.file_filter:
                 continue
 
-            if file_name == 'firebase_event_daily.complete.json':
+            if file_name in ('firebase_event_daily.complete.json', 'firebase_app_event_daily.complete.json'):
                 continue
 
             if file_name in self.processors:
@@ -132,20 +133,22 @@ class DataProcessor:
 
         reports = processor.process_data(local_path)
 
-        if file_name == 'firebase_event_daily.csv':
+        if isinstance(processor, FirebaseProcessor):
             date_str = s3_prefix.split('/')[-1]
             completion = {'apps': {}, 'source_sha256': ''}
-            manifest_key = file_key.rsplit('/', 1)[0] + '/firebase_event_daily.complete.json'
+            manifest_key = file_key.rsplit('/', 1)[0] + '/' + file_name.replace('.csv', '.complete.json')
             manifest_path = local_path + '.complete.json'
             try:
                 self.s3_client.download_file(manifest_key, manifest_path)
             except ClientError as exc:
+                if isinstance(processor, FirebaseAppEventProcessor):
+                    raise
                 if exc.response.get('Error', {}).get('Code') not in ('404', 'NoSuchKey', 'NotFound'):
                     raise
                 logger.warning('Firebase completion manifest missing; zero-user days remain unconfirmed')
             else:
                 completion = processor.process_completion_manifest(local_path, manifest_path, date_str, reports)
-            self.db_client.replace_firebase_day(date_str, reports, **completion)
+            self.db_client.replace_firebase_day(date_str, reports, table_name=table_name, **completion)
             logger.info(f'Finished processing Firebase events and completion state for {date_str}')
             return
 

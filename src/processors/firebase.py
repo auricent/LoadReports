@@ -80,3 +80,36 @@ class FirebaseProcessor(ReportProcessor):
 
     def get_target_table(self) -> str:
         return "firebase_event_daily"
+
+
+class FirebaseAppEventProcessor(FirebaseProcessor):
+    """App/event summaries are independent of country/version detail reports."""
+
+    def process_data(self, file_path: str) -> List[ReportData]:
+        reports = super().process_data(file_path)
+        seen = set()
+        for report in reports:
+            if (not report.stream_id or not report.app_id.endswith('-macOS')
+                    or not report.event_name or report.event_name == '(other)'
+                    or report.platform != 'iOS'
+                    or report.operating_system or report.app_version or report.country
+                    or min(report.event_count, report.total_users, report.active_users) < 0):
+                raise ValueError('Invalid Firebase app/event summary row')
+            key = (report.day, report.stream_id, report.platform, report.event_name)
+            if key in seen:
+                raise ValueError('Duplicate Firebase app/event summary row')
+            seen.add(key)
+        return reports
+
+    def process_completion_manifest(self, csv_path: str, manifest_path: str, day: str, reports: List[ReportData]) -> dict:
+        completion = super().process_completion_manifest(csv_path, manifest_path, day, reports)
+        with open(manifest_path, 'r', encoding='utf-8') as handle:
+            manifest = json.load(handle)
+        if manifest.get('aggregation') != 'app_event' or manifest.get('quality_verified') is not True:
+            raise ValueError('Firebase app/event summary quality is not verified')
+        if not completion['apps'] or any(not app.endswith('-macOS') for app in completion['apps'].values()):
+            raise ValueError('Invalid Firebase app/event summary app identities')
+        return completion
+
+    def get_target_table(self) -> str:
+        return 'firebase_app_event_daily'

@@ -88,28 +88,36 @@ class DatabaseClient:
         data_dicts = [report.to_dict() for report in reports]
         self.insert_data(table_name, data_dicts)
 
-    def replace_firebase_day(self, day: str, reports: List[ReportData], apps: Dict[str, str], source_sha256: str) -> None:
+    def replace_firebase_day(self, day: str, reports: List[ReportData], apps: Dict[str, str], source_sha256: str,
+                             table_name: str = 'firebase_event_daily') -> None:
         if not self.connection or not self.connection.is_connected():
             raise Exception('Database not connected')
         if any(str(report.day) != day for report in reports):
             raise ValueError('Firebase CSV contains a different report date')
+        completion_tables = {
+            'firebase_event_daily': 'firebase_collection_daily',
+            'firebase_app_event_daily': 'firebase_app_collection_daily',
+        }
+        if table_name not in completion_tables:
+            raise ValueError('Unsupported Firebase report table')
+        completion_table = completion_tables[table_name]
 
         cursor = self.connection.cursor()
         try:
-            cursor.execute('DELETE FROM firebase_event_daily WHERE day = %s', (day,))
+            cursor.execute(f'DELETE FROM {table_name} WHERE day = %s', (day,))
             if reports:
                 data = [report.to_dict() for report in reports]
                 columns = list(data[0])
                 column_names = ', '.join(f'`{column}`' for column in columns)
                 placeholders = ', '.join(['%s'] * len(columns))
                 cursor.executemany(
-                    f'INSERT INTO firebase_event_daily ({column_names}) VALUES ({placeholders})',
+                    f'INSERT INTO {table_name} ({column_names}) VALUES ({placeholders})',
                     [tuple(row[column] for column in columns) for row in data],
                 )
-            cursor.execute('DELETE FROM firebase_collection_daily WHERE day = %s', (day,))
+            cursor.execute(f'DELETE FROM {completion_table} WHERE day = %s', (day,))
             if apps:
                 cursor.executemany(
-                    'INSERT INTO firebase_collection_daily (day, stream_id, app_id, source_sha256) VALUES (%s, %s, %s, %s)',
+                    f'INSERT INTO {completion_table} (day, stream_id, app_id, source_sha256) VALUES (%s, %s, %s, %s)',
                     [(day, stream, app, source_sha256) for stream, app in apps.items()],
                 )
             self.connection.commit()
